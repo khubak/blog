@@ -6,7 +6,7 @@ import { getCachedPosts } from '@/api/posts'
 import { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { extractCommonPostHashtags } from '@/helpers/hashtags'
 
-const filterPostsData = (posts: Post[], query: string, hashtags: string[]): Post[] => {
+const filterPostsData = (posts: Post[], query: string, hashtag: string): Post[] => {
   let filteredPosts = posts
 
   if (query) {
@@ -16,10 +16,8 @@ const filterPostsData = (posts: Post[], query: string, hashtags: string[]): Post
     )
   }
 
-  if (hashtags.length > 0) {
-    filteredPosts = filteredPosts.filter((post) =>
-      hashtags.some((tag) => post.title.toLowerCase().includes(tag.toLowerCase()))
-    )
+  if (hashtag) {
+    filteredPosts = filteredPosts.filter((post) => post.hashtags.includes(hashtag))
   }
 
   return filteredPosts
@@ -46,12 +44,12 @@ export const Home: InferGetStaticPropsType<typeof getStaticProps> = ({
   commonHashtags: string[]
 }) => {
   const [filteredPosts, setFilteredPosts] = useState<Post[]>(posts)
-  const [selectedHashtags, setSelectedHashtags] = useState<string[]>([])
+  const [selectedHashtag, setSelectedHashtag] = useState<string>('')
   const [searchQuery, setSearchQuery] = useState('')
 
   const filterPosts = useCallback(
-    (query: string, hashtags: string[]) => {
-      const filtered = filterPostsData(posts, query, hashtags)
+    (query: string, hashtag: string) => {
+      const filtered = filterPostsData(posts, query, hashtag)
       setFilteredPosts(filtered)
     },
     [posts]
@@ -60,20 +58,18 @@ export const Home: InferGetStaticPropsType<typeof getStaticProps> = ({
   const handleSearch = useCallback(
     (query: string) => {
       setSearchQuery(query)
-      filterPosts(query, selectedHashtags)
+      filterPosts(query, selectedHashtag)
     },
-    [filterPosts, selectedHashtags]
+    [filterPosts, selectedHashtag]
   )
 
   const handleHashtagClick = useCallback(
     (hashtag: string) => {
-      const updatedHashtags = selectedHashtags.includes(hashtag)
-        ? selectedHashtags.filter((h) => h !== hashtag)
-        : [...selectedHashtags, hashtag]
-      setSelectedHashtags(updatedHashtags)
-      filterPosts(searchQuery, updatedHashtags)
+      const newHashtag = selectedHashtag === hashtag ? '' : hashtag
+      setSelectedHashtag(newHashtag)
+      filterPosts(searchQuery, newHashtag)
     },
-    [filterPosts, searchQuery, selectedHashtags]
+    [filterPosts, searchQuery, selectedHashtag]
   )
 
   return (
@@ -94,9 +90,7 @@ export const Home: InferGetStaticPropsType<typeof getStaticProps> = ({
               key={hashtag}
               onClick={() => handleHashtagClick(hashtag)}
               className={`px-3 py-1 rounded-full text-sm ${
-                selectedHashtags.includes(hashtag)
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                selectedHashtag === hashtag ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
               }`}
             >
               #{hashtag}
