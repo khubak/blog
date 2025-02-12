@@ -1,54 +1,80 @@
-'use client'
-
-import { useState, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { PostCard } from '@/components/PostCard'
 import { SearchBar } from '@/components/SearchBar'
 import { Post } from '@/models/post'
+import { getCachedPosts } from '@/api/posts'
+import { GetStaticProps, InferGetStaticPropsType } from 'next'
+import { extractCommonPostHashtags } from '@/helpers/hashtags'
 
-const allHashtags = ['tech', 'web3', 'blockchain', 'development', 'ai', 'crypto']
+const filterPostsData = (posts: Post[], query: string, hashtags: string[]): Post[] => {
+  let filteredPosts = posts
 
-export default function Home() {
-  const [posts, setPosts] = useState<Post[]>([])
-  const [filteredPosts, setFilteredPosts] = useState<Post[]>([])
+  if (query) {
+    filteredPosts = filteredPosts.filter(
+      (post) =>
+        post.title.toLowerCase().includes(query.toLowerCase()) || post.body.toLowerCase().includes(query.toLowerCase())
+    )
+  }
+
+  if (hashtags.length > 0) {
+    filteredPosts = filteredPosts.filter((post) =>
+      hashtags.some((tag) => post.title.toLowerCase().includes(tag.toLowerCase()))
+    )
+  }
+
+  return filteredPosts
+}
+
+export const getStaticProps: GetStaticProps = async () => {
+  const posts = await getCachedPosts()
+  const commonHashtags = extractCommonPostHashtags(posts)
+
+  return {
+    props: {
+      posts,
+      commonHashtags,
+    },
+    revalidate: 3600,
+  }
+}
+
+export const Home: InferGetStaticPropsType<typeof getStaticProps> = ({
+  posts,
+  commonHashtags,
+}: {
+  posts: Post[]
+  commonHashtags: string[]
+}) => {
+  const [filteredPosts, setFilteredPosts] = useState<Post[]>(posts)
   const [selectedHashtags, setSelectedHashtags] = useState<string[]>([])
   const [searchQuery, setSearchQuery] = useState('')
 
-  useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/posts')
-      .then((res) => res.json())
-      .then((data) => {
-        setPosts(data)
-        setFilteredPosts(data)
-      })
-  }, [])
+  const filterPosts = useCallback(
+    (query: string, hashtags: string[]) => {
+      const filtered = filterPostsData(posts, query, hashtags)
+      setFilteredPosts(filtered)
+    },
+    [posts]
+  )
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query)
-    filterPosts(query, selectedHashtags)
-  }
+  const handleSearch = useCallback(
+    (query: string) => {
+      setSearchQuery(query)
+      filterPosts(query, selectedHashtags)
+    },
+    [filterPosts, selectedHashtags]
+  )
 
-  const handleHashtagClick = (hashtag: string) => {
-    const updatedHashtags = selectedHashtags.includes(hashtag)
-      ? selectedHashtags.filter((h) => h !== hashtag)
-      : [...selectedHashtags, hashtag]
-    setSelectedHashtags(updatedHashtags)
-    filterPosts(searchQuery, updatedHashtags)
-  }
-
-  const filterPosts = (query: string, hashtags: string[]) => {
-    let filtered = posts
-    if (query) {
-      filtered = filtered.filter(
-        (post) =>
-          post.title.toLowerCase().includes(query.toLowerCase()) ||
-          post.body.toLowerCase().includes(query.toLowerCase())
-      )
-    }
-    if (hashtags.length > 0) {
-      filtered = filtered.filter((post) => hashtags.some((tag) => post.title.toLowerCase().includes(tag.toLowerCase())))
-    }
-    setFilteredPosts(filtered)
-  }
+  const handleHashtagClick = useCallback(
+    (hashtag: string) => {
+      const updatedHashtags = selectedHashtags.includes(hashtag)
+        ? selectedHashtags.filter((h) => h !== hashtag)
+        : [...selectedHashtags, hashtag]
+      setSelectedHashtags(updatedHashtags)
+      filterPosts(searchQuery, updatedHashtags)
+    },
+    [filterPosts, searchQuery, selectedHashtags]
+  )
 
   return (
     <div className='container mx-auto px-4 py-8'>
@@ -63,7 +89,7 @@ export default function Home() {
           <SearchBar onSearch={handleSearch} />
         </div>
         <div className='flex flex-wrap justify-center gap-2 mb-6'>
-          {allHashtags.map((hashtag) => (
+          {commonHashtags.map((hashtag) => (
             <button
               key={hashtag}
               onClick={() => handleHashtagClick(hashtag)}
@@ -85,7 +111,7 @@ export default function Home() {
             id={post.id}
             title={post.title}
             body={post.body}
-            hashtags={allHashtags.slice(0, 2)}
+            hashtags={post.hashtags}
             onHashtagClick={handleHashtagClick}
           />
         ))}
@@ -93,3 +119,5 @@ export default function Home() {
     </div>
   )
 }
+
+export default Home

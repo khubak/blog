@@ -1,25 +1,26 @@
 import { GetStaticProps, GetStaticPaths } from 'next'
 import { notFound } from 'next/navigation'
 import { Post } from '@/models/post'
+import { getCachedPosts } from '@/api/posts'
 
 interface Props {
   post: Post
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const posts = await fetch('https://jsonplaceholder.typicode.com/posts').then((res) => res.json())
+export const getStaticPaths = (async () => {
+  const posts = await getCachedPosts()
 
   return {
     paths: posts.map((post: Post) => ({
       params: { id: post.id.toString() },
     })),
-    fallback: false,
+    fallback: 'blocking',
   }
-}
+}) satisfies GetStaticPaths
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${params?.id}`)
-  const post = await res.json()
+  const res = await getCachedPosts()
+  const post = res.find((post) => post.id === Number(params?.id))
 
   if (!post) {
     return {
