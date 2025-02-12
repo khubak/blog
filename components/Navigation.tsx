@@ -16,16 +16,17 @@ export function Navigation() {
         <div className='flex gap-6'>
           <Link
             href='/'
-            className={cn('text-sm transition-colors hover:text-purple-400', pathname === '/' && 'text-purple-400')}
+            className={cn('text-sm transition-colors hover:text-purple-400', {
+              'link-active': pathname === '/',
+            })}
           >
             Blog
           </Link>
           <Link
             href='/about'
-            className={cn(
-              'text-sm transition-colors hover:text-purple-400',
-              pathname === '/about' && 'text-purple-400'
-            )}
+            className={cn('text-sm transition-colors hover:text-purple-400', {
+              'link-active': pathname === '/about',
+            })}
           >
             About
           </Link>

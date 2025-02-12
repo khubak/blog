@@ -23,9 +23,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const post = res.find((post) => post.id === Number(params?.id))
 
   if (!post) {
-    return {
-      notFound: true,
-    }
+    notFound()
   }
 
   return {
@@ -36,10 +34,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 }
 
 export default function PostPage({ post }: Props) {
-  if (!post) {
-    notFound()
-  }
-
   return (
     <article className='container mx-auto px-4 py-8 max-w-3xl'>
       <h1 className='text-4xl font-bold mb-6'>{post.title}</h1>
