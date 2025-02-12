@@ -4,7 +4,7 @@ A modern, performant blog platform built with Next.js, TypeScript, and Tailwind 
 
 ## 🌐 Live Demo
 
-[View Demo on Vercel](https://your-vercel-url-here)
+[View Demo on Vercel](https://blog-lemon-two-34.vercel.app/)
 
 ## ✨ Features
 
