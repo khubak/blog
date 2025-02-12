@@ -1,6 +1,7 @@
 # Miracle Tree Blog
 
 A modern, performant blog platform built with Next.js, TypeScript, and Tailwind CSS.
+Main feature: 1 fetch for all 100 posts (across all pages) on build time.
 
 ## 🌐 Live Demo
 
@@ -9,12 +10,12 @@ A modern, performant blog platform built with Next.js, TypeScript, and Tailwind 
 ## ✨ Features
 
 - Static site generation with ISR
+- Searchbar with lodash debouncer
 - Real-time post filtering and search
 - Dynamic hashtag system
 - Responsive design with Tailwind CSS
 - Type-safe data handling
 - Performance optimized caching
-- Gradient text effects
 - Card-based post layout
 
 ## 🚀 Getting Started
@@ -22,8 +23,8 @@ A modern, performant blog platform built with Next.js, TypeScript, and Tailwind 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/miracle-tree-blog.git
-cd miracle-tree-blog
+git clone https://github.com/yourusername/blog.git
+cd blog
 ```
 
 2. Install dependencies:
@@ -70,7 +71,3 @@ yarn format       # Run Prettier
 ## 📄 License
 
 MIT License
-
-## 🤝 Contributing
-
-Contributions welcome! Please feel free to submit a Pull Request.
