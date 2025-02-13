@@ -18,7 +18,7 @@ export const getStaticPaths = (async () => {
   }
 }) satisfies GetStaticPaths
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps = (async ({ params }) => {
   const res = await getCachedPosts()
   const post = res.find((post) => post.id === Number(params?.id))
 
@@ -31,7 +31,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       post,
     },
   }
-}
+}) satisfies GetStaticProps
 
 export default function PostPage({ post }: Props) {
   return (

@@ -1,7 +1,7 @@
 # Miracle Tree Blog
 
-A modern, performant blog platform built with Next.js, TypeScript, and Tailwind CSS.
-Main feature: 1 fetch for all 100 posts (across all pages) on build time.
+- A modern, performant blog platform built with Next.js, TypeScript, and Tailwind CSS.
+- Main feature: 1 fetch for all 100 posts (across all pages) on build time (a bit overengineered, but suitable for this project).
 
 ## 🌐 Live Demo
 
