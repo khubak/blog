@@ -53,7 +53,7 @@ miracle-tree-blog/
 ├── pages/            # Next.js pages
 ├── api/              # API utilities
 ├── helpers/          # Utilities
-├── models/           # TypeScript types
+├── models/           # Data models
 └── public/           # Static assets
 ```
 
